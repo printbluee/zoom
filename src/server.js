@@ -1,3 +1,5 @@
+import http from"http";
+import WebSocket from "ws";
 import express from "express";
 
 const app = express();
@@ -10,6 +12,11 @@ app.use("/public", express.static(__dirname + "/public"));
 // public url 생성해 유저에게 파일 공유
 app.get("/", (req, res) => res.render("home"));
 // home.pug를 render 해주는 route handler 만들기
+app.get("/*", (req, res) => res.redirect("/"));
 
 const handleListten = () => console.log(`Listening on http://localhost:3000`);
-app.listen(3000, handleListten);
+
+const server = http.createServer(app);
+const wss = new WebSocket.Server({ server });
+
+server.listen(3000, handleListten);
