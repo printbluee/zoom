@@ -4,7 +4,7 @@ import express from "express";
 
 const app = express();
 
-app.set("view engine", "pug"); 
+app.set("view engine", "pug");
 // Pug로 view engine 설정
 app.set("views", __dirname + "/views");
 // express에 templatedl 어디 있는지 지정
@@ -19,13 +19,20 @@ const handleListten = () => console.log(`Listening on http://localhost:3000`);
 const server = http.createServer(app);
 const wss = new WebSocket.Server({ server });
 
+function onSocketClose() {
+    console.log("Disconnected from the Browser");
+}
+
+const sockets = [];
+
 wss.on("connection", (socket) => {
-    console.log("Connected to Browser");
-    socket.on("close", () => console.log("Disconnected from the Browser "));
-    socket.on("message", message => {
-        console.log(message);
-    })
-    socket.send('hello !!');
-});
+    sockets.push(socket);
+    console.log("Connected to Browser ✅");
+    socket.on("close", () => onSocketClose);
+    socket.on("message", (message) => {
+        console.log(message.toString("utf-8"));
+        sockets.forEach(aSocket => aSocket.send(message.toString()));
+        });
+  });
 
 server.listen(3000, handleListten);
