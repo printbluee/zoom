@@ -40,12 +40,8 @@ wss.on("connection", (socket) => {
   });
 
 server.listen(3000, handleListten);
+ 
 
-{
-type:"message";
-payload:"hello everyone!";
-}
-{
-type:"nickname";
-payload:"hey";
-}
+
+socket.on('nickname', fn)
+socket.on('notification', fn)
