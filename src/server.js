@@ -1,7 +1,8 @@
 import http from"http";
-import WebSocket from "ws";
-import express, { json } from "express";
-import { type } from "os";
+import express from 'express';
+import SocketIO from 'socket.io';
+// import WebSocket from "ws";
+
 
 const app = express();
 
@@ -13,35 +14,40 @@ app.get("/*", (req, res) => res.redirect("/"));
 
 const handleListten = () => console.log(`Listening on http://localhost:3000`);
 
-const server = http.createServer(app);
-const wss = new WebSocket.Server({ server });
+const httpServer = http.createServer(app);
+const wsServer = SocketIO(httpServer);
 
-function onSocketClose() {
-    console.log("Disconnected from the Browser");
-}
-
-const sockets = [];
-
-wss.on("connection", (socket) => {
-    sockets.push(socket);
-    socket['nickname'] = '';
-    console.log("Connected to Browser ✅");
-    socket.on("close", onSocketClose);
-    socket.on("message", (msg) => {
-        const message = JSON.parse(msg.toString("utf8"));
-        switch(message.type) {
-            case 'new_message' : 
-                sockets.forEach((aSocket) => 
-                    aSocket.send(`${socket.nickname}: ${message.payload}`));
-            case 'nickname' :
-                socket['nickname'] = message.payload;
-        }
+wsServer.on("connection", (socket) => {
+    socket.on('enter_room', (roomName, done) => {
+        console.log(roomName);
+        setTimeout(() => {
+            done('hello from rhe backend');
+        }, 15000);
     });
-  });
+});
 
-server.listen(3000, handleListten);
- 
+httpServer.listen(3000, handleListten);
 
+// const sockets = [];
+// function onSocketClose() {
+//     console.log("Disconnected from the Browser");
+// }
+// wss.on("connection", (socket) => {
+//     sockets.push(socket);
+//     socket['nickname'] = '';
+//     console.log("Connected to Browser ✅");
+//     socket.on("close", onSocketClose);
+//     socket.on("message", (msg) => {
+//         const message = JSON.parse(msg.toString("utf8"));
+//         switch(message.type) {
+//             case 'new_message' : 
+//                 sockets.forEach((aSocket) => 
+//                     aSocket.send(`${socket.nickname}: ${message.payload}`));
+//             case 'nickname' :
+//                 socket['nickname'] = message.payload;
+//         }
+//     });
+//   });
 
-socket.on('nickname', fn)
-socket.on('notification', fn)
+// socket.on('nickname', fn)
+// socket.on('notification', fn)
